@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MR FOOD CAFE NAVEED - Order Fast Food Online Bhiria Road</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO & Search Engine Optimization Tags for Google Ranking -->
+  <meta name="description" content="Order fresh fast food online from MR FOOD CAFE NAVEED in Bhiria Road, Sindh. Delicious Zinger Burgers, Fries, Deals & Fast Home Delivery.">
+  <meta name="keywords" content="MR FOOD CAFE NAVEED, MR FOOD CAFE, Bhiria Road food delivery, fast food Bhiria Road, order online Bhiria Road, Zinger burger Bhiria Road">
+  <meta name="author" content="MR FOOD CAFE NAVEED">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Social Media & Open Graph Tags -->
+  <meta property="og:title" content="MR FOOD CAFE NAVEED - Order Online in Bhiria Road">
+  <meta property="og:description" content="We make fast food in premier taste. Fresh, fast home delivery in Bhiria Road Sindh, Pakistan.">
+  <meta property="og:type" content="website">
+
+  <!-- Progressive Web App (PWA) Tags for Google Chrome & Mobile App Install -->
+  <meta name="theme-color" content="#FDA172">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MR FOOD CAFE">
+  <link rel="manifest" href="data:application/json,{%22name%22:%22MR%20FOOD%20CAFE%20NAVEED%22,%22short_name%22:%22CafeNaveed%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22#FAF6F2%22,%22theme_color%22:%22#FDA172%22}">
+
+  <style>
+    :root {
+      --cantaloupe: #FDA172;
+      --cantaloupe-dark: #E0895A;
+      --cantaloupe-light: #FFF2EB;
+      --text-dark: #2A3B39;
+      --bg-light: #FAF6F2;
+      --white: #FFFFFF;
+      --border-color: #F0DED5;
+      --success: #2ECC71;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-light); margin: 0; padding: 0; color: var(--text-dark); min-height: 100vh; }
+    
+    .header { background: linear-gradient(135deg, var(--cantaloupe), var(--cantaloupe-dark)); color: var(--white); padding: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(253, 161, 114, 0.3); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; }
+    .header-top { display: flex; align-items: center; justify-content: space-between; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    
+    /* Interactive Tactile Feeling for Action Controls */
+    .hamburger { font-size: 24px; cursor: pointer; background: none; border: none; color: var(--white); outline: none; transition: transform 0.1s; }
+    .hamburger:active { transform: scale(0.85); }
+    .brand-title { font-size: 18px; font-weight: bold; }
+    .customer-welcome-tag { font-size: 11px; background: rgba(255,255,255,0.25); padding: 3px 8px; border-radius: 12px; margin-top: 6px; display: inline-block; }
+
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 998; }
+    .sidebar-drawer { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--white); z-index: 999; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.2); }
+    .sidebar-drawer.open { left: 0; }
+    .sidebar-header { background: linear-gradient(135deg, var(--cantaloupe), var(--cantaloupe-dark)); color: var(--white); padding: 25px 20px; position: relative; }
+    .sidebar-header h2 { margin: 0; font-size: 18px; }
+    .sidebar-header p { margin: 4px 0 0 0; font-size: 12px; }
+    .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+    .nav-section-title { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; padding: 12px 20px 4px 20px; }
+    
+    .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--text-dark); text-decoration: none; border-left: 4px solid transparent; cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .nav-link:hover, .nav-link.active { background-color: var(--cantaloupe-light); color: var(--cantaloupe-dark); border-left-color: var(--cantaloupe); }
+    .nav-link:active { transform: translateX(5px) scale(0.97); background-color: var(--cantaloupe); color: white; }
+
+    .container { max-width: 600px; margin: 15px auto; padding: 0 15px; box-sizing: border-box; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .section-title { font-size: 18px; font-weight: bold; color: var(--cantaloupe-dark); margin-bottom: 12px; border-bottom: 2px solid var(--cantaloupe); padding-bottom: 6px; }
+
+    .menu-card { background: var(--white); border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); box-shadow: 0 3px 10px rgba(253, 161, 114, 0.08); }
+    .item-img { width: 70px; height: 70px; object-fit: cover; border-radius: 50%; background: var(--cantaloupe-light); border: 2px solid var(--cantaloupe); flex-shrink: 0; }
+    .menu-card-info { flex: 1; }
+    .menu-card-info h3 { margin: 0 0 3px 0; font-size: 15px; }
+    .price-tag { font-weight: bold; color: var(--cantaloupe-dark); font-size: 14px; margin-top: 4px; }
+    
+    .btn-add { background: var(--cantaloupe); color: var(--white); border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.1s ease; box-shadow: 0 2px 6px rgba(253,161,114,0.3); user-select: none; }
+    .btn-add:hover { background: var(--cantaloupe-dark); }
+    .btn-add:active { transform: scale(0.92); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+
+    .cart-box { background: var(--white); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 3px 12px rgba(0,0,0,0.05); }
+    .cart-item-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+    label { font-size: 12px; font-weight: bold; margin-top: 10px; display: block; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 4px; box-sizing: border-box; border-radius: 8px; border: 1px solid var(--cantaloupe); font-size: 13px; outline: none; background: #fffbf9; }
+    
+    .btn-submit { background: var(--success); color: var(--white); border: none; width: 100%; padding: 12px; font-weight: bold; font-size: 15px; border-radius: 8px; cursor: pointer; margin-top: 15px; box-shadow: 0 3px 10px rgba(46,204,113,0.3); transition: all 0.1s ease; user-select: none; }
+    .btn-submit:hover { background: #27ae60; }
+    .btn-submit:active { transform: translateY(2px) scale(0.98); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+
+    .info-panel { background: var(--white); border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .footer-text { text-align: center; font-size: 12px; color: #777; margin-top: 25px; line-height: 1.6; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+    .modal-card { background: white; padding: 25px; border-radius: 15px; max-width: 380px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.25); text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- PWA Install Prompt Banner -->
+  <div id="pwaBanner" style="display:none; background:var(--cantaloupe-dark); color:white; padding:10px; text-align:center; font-size:12px; font-weight:bold; cursor:pointer;" onclick="installPWA()">
+    📲 Add MR FOOD CAFE App to Home Screen / Install
+  </div>
+
+  <div id="customerLoginModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <h2 style="color:var(--cantaloupe-dark); margin-top:0;">Welcome to MR FOOD CAFE</h2>
+      <p style="font-size:12px; color:#666;">Enter your details to order & see profile history.</p>
+      <label style="text-align:left;">Your Name:</label>
+      <input type="text" id="modalCustName" placeholder="e.g. Ali Ahmed">
+      <label style="text-align:left;">Phone Number:</label>
+      <input type="text" id="modalCustPhone" placeholder="e.g. 03001234567">
+      <button class="btn-submit" style="background:var(--cantaloupe);" onclick="registerOrLoginCustomer()">Continue 🚀</button>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="brand-title">MR FOOD CAFE NAVEED</div>
+      </div>
+      <div style="font-size: 11px; background: rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 15px; font-weight: 600;">Premier Taste</div>
+    </div>
+    <div id="activeCustomerBadge" class="customer-welcome-tag">👤 Guest</div>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar-drawer" id="sidebarDrawer">
+    <div class="sidebar-header">
+      <button class="close-btn" onclick="toggleSidebar()">✕</button>
+      <h2>MR FOOD CAFE NAVEED</h2>
+      <p>We make fast food in premier taste</p>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-title">MAIN MENU</div>
+      <div class="nav-link active" id="nav-menuView" onclick="switchView('menuView', this)">📋 Menu</div>
+      <div class="nav-link" id="nav-dealsView" onclick="switchView('dealsView', this)">🏷️ Deals & Offers</div>
+      <div class="nav-link" id="nav-profileView" onclick="switchView('profileView', this)">👤 My Profile</div>
+      <div class="nav-link" id="nav-ordersView" onclick="switchView('ordersView', this)">🛒 My Orders</div>
+      <div class="nav-section-title" style="margin-top:10px;">QUERY & SUPPORT</div>
+      <div class="nav-link" id="nav-contactView" onclick="switchView('contactView', this)">📞 Contact</div>
+      <div class="nav-link" id="nav-aboutView" onclick="switchView('aboutView', this)">ℹ️ About Us</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Menu View -->
+    <div id="menuView" class="page-view active">
+      <div class="section-title">Full Ordering Menu</div>
+      <div id="menuList">Loading menu from cafe cloud...</div>
+
+      <div class="cart-box">
+        <div class="section-title" style="font-size:15px; border-bottom:1px dashed var(--cantaloupe);">Order Summary</div>
+        <div id="cartItems" style="font-size:13px; color:#555; margin:10px 0;">No items added.</div>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:15px; margin-bottom:10px; color:var(--cantaloupe-dark);">
+          <span>Total Amount:</span>
+          <span>Rs. <span id="cartTotal">0</span></span>
+        </div>
+
+        <label>Your Name:</label>
+        <input type="text" id="custName" readonly style="background:#f0f0f0;">
+        <label>Phone Number:</label>
+        <input type="text" id="custPhone" readonly style="background:#f0f0f0;">
+        <label>Delivery Address:</label>
+        <textarea id="custAddress" placeholder="House / Street details" rows="2"></textarea>
+        <button class="btn-submit" onclick="submitOnlineOrder()">Submit Order to Cafe POS 🛵</button>
+      </div>
+    </div>
+
+    <!-- Deals View -->
+    <div id="dealsView" class="page-view">
+      <div class="section-title">Special Deals & Offers</div>
+      <div id="dealsList">Loading active deals...</div>
+    </div>
+
+    <!-- Profile View -->
+    <div id="profileView" class="page-view">
+      <div class="section-title">My Customer Profile</div>
+      <div class="info-panel">
+        <p><b>Customer ID:</b> <span id="profileIdDisplay" style="color:var(--cantaloupe-dark); font-weight:bold;">-</span></p>
+        <p><b>Full Name:</b> <span id="profileNameDisplay">-</span></p>
+        <p><b>Mobile Phone:</b> <span id="profilePhoneDisplay" style="color:var(--cantaloupe-dark); font-weight:bold;">-</span></p>
+      </div>
+    </div>
+
+    <!-- Orders View -->
+    <div id="ordersView" class="page-view">
+      <div class="section-title">My Placed Orders & Live Status</div>
+      <div id="myOrdersHistory">No orders found.</div>
+    </div>
+
+    <!-- Contact View -->
+    <div id="contactView" class="page-view">
+      <div class="section-title">Contact Us</div>
+      <div class="info-panel">
+        <p><b>Contact / JazzCash:</b></p>
+        <p id="contactPhoneDisplay" style="font-size: 18px; color: var(--cantaloupe-dark); font-weight: bold;">03000878384</p>
+      </div>
+    </div>
+
+    <!-- About View -->
+    <div id="aboutView" class="page-view">
+      <div class="section-title">About MR FOOD CAFE NAVEED</div>
+      <div class="info-panel">
+        <h3 style="margin:0; color:var(--cantaloupe-dark);">MR FOOD CAFE NAVEED</h3>
+        <p style="font-weight:bold;">We make fast food in premier taste</p>
+      </div>
+    </div>
+
+    <div class="footer-text">
+      <p style="font-weight:bold;">MR FOOD CAFE NAVEED — We deliver the taste</p>
+      <p>📍 Bhiria Road Sindh, Pakistan</p>
+    </div>
+  </div>
+
+<script>
+  const BIN_ID = '6aca165fffd5d160535eb6ec';
+  const API_KEY = '$2a$10$bLSrQ4H2Ir7dRVTTM09/9.5bkQRKoXbT47QspaCrchBOm9vk.ceTu';
+
+  let cafeMenu = [];
+  let cafeDeals = [];
+  let contactPhone = '03000878384';
+  let cart = [];
+  let activeCustomer = null;
+  let deferredPrompt;
+  const defaultFoodImg = 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150';
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('pwaBanner').style.display = 'block';
+  });
+
+  function installPWA() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+    }
+  }
+
+  function toggleSidebar() {
+    const drawer = document.getElementById('sidebarDrawer');
+    const overlay = document.getElementById('sidebarOverlay');
+    drawer.classList.toggle('open');
+    overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
+  }
+
+  function switchView(viewId, element) {
+    document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    
+    if (element) element.classList.add('active');
+    if (viewId === 'profileView') renderProfileInfo();
+    if (viewId === 'ordersView') renderMyOrdersHistory();
+    
+    if (document.getElementById('sidebarDrawer').classList.contains('open')) toggleSidebar();
+  }
+
+  function checkCustomerSession() {
+    const saved = localStorage.getItem('cafeActiveCustomer');
+    if (saved) {
+      activeCustomer = JSON.parse(saved);
+      document.getElementById('activeCustomerBadge').innerText = `👤 ${activeCustomer.name} (${activeCustomer.phone})`;
+      document.getElementById('custName').value = activeCustomer.name;
+      document.getElementById('custPhone').value = activeCustomer.phone;
+    } else {
+      document.getElementById('customerLoginModal').style.display = 'flex';
+    }
+  }
+
+  function registerOrLoginCustomer() {
+    const name = document.getElementById('modalCustName').value.trim();
+    const phone = document.getElementById('modalCustPhone').value.trim();
+    if (!name || !phone) return alert("Enter both name and phone number.");
+
+    activeCustomer = { customerId: 'CN-' + Math.floor(1000 + Math.random() * 9000), name, phone };
+    localStorage.setItem('cafeActiveCustomer', JSON.stringify(activeCustomer));
+
+    document.getElementById('activeCustomerBadge').innerText = `👤 ${activeCustomer.name} (${activeCustomer.phone})`;
+    document.getElementById('custName').value = name;
+    document.getElementById('custPhone').value = phone;
+    document.getElementById('customerLoginModal').style.display = 'none';
+
+    loadDataAutomatically();
+  }
+
+  function renderProfileInfo() {
+    if (!activeCustomer) return;
+    document.getElementById('profileIdDisplay').innerText = activeCustomer.customerId;
+    document.getElementById('profileNameDisplay').innerText = activeCustomer.name;
+    document.getElementById('profilePhoneDisplay').innerText = activeCustomer.phone;
+  }
+
+  async function loadDataAutomatically() {
+    try {
+      let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+      let data = await res.json();
+      if (data.record) {
+        cafeMenu = data.record.menu || [];
+        cafeDeals = data.record.deals || [];
+        contactPhone = data.record.contactPhone || '03000878384';
+
+        syncCustomerOrdersStatus(data.record.orders || [], data.record.completedOrders || []);
+      }
+    } catch (e) {
+      console.log("Loading offline defaults...");
+    }
+    renderAllViews();
+    renderMyOrdersHistory();
+  }
+
+  function syncCustomerOrdersStatus(cloudPending, cloudCompleted) {
+    if (!activeCustomer) return;
+    let localOrders = JSON.parse(localStorage.getItem('myCafeOrders') || '[]');
+    
+    let updated = localOrders.map(lo => {
+      const foundCompleted = cloudCompleted.find(co => String(co.phone) === String(activeCustomer.phone) && String(co.items[0]?.name) === String(lo.items[0]?.name));
+      if (foundCompleted || lo.acknowledged) {
+        lo.status = 'Order is Ready! ✅';
+        lo.acknowledged = true;
+      } else {
+        lo.status = 'Pending at Cafe POS...';
+      }
+      return lo;
+    });
+
+    localStorage.setItem('myCafeOrders', JSON.stringify(updated));
+  }
+
+  function renderAllViews() {
+    const menuBox = document.getElementById('menuList');
+    if (cafeMenu.length === 0) {
+      menuBox.innerHTML = '<p>No menu items available currently.</p>';
+    } else {
+      menuBox.innerHTML = cafeMenu.map(i => `
+        <div class="menu-card">
+          <img src="${i.image || defaultFoodImg}" class="item-img" alt="${i.name}">
+          <div class="menu-card-info">
+            <h3>${i.name}</h3>
+            <div class="price-tag">Rs. ${i.price}</div>
+          </div>
+          <button class="btn-add" onclick="addToCart('${i.name}', ${i.price})">+ Add</button>
+        </div>
+      `).join('');
+    }
+
+    const dealsBox = document.getElementById('dealsList');
+    if (cafeDeals.length === 0) {
+      dealsBox.innerHTML = '<div class="info-panel"><p>No special deals active right now.</p></div>';
+    } else {
+      dealsBox.innerHTML = cafeDeals.map(d => `
+        <div class="menu-card" style="border-left: 4px solid var(--cantaloupe);">
+          <img src="${d.image || defaultFoodImg}" class="item-img" alt="${d.title}">
+          <div class="menu-card-info">
+            <h3 style="color:var(--cantaloupe-dark);">${d.title}</h3>
+            <div class="price-tag">Deal Price: Rs. ${d.price}</div>
+          </div>
+          <button class="btn-add" onclick="addToCart('${d.title}', ${d.price})">+ Add Deal</button>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('contactPhoneDisplay').innerText = contactPhone;
+  }
+
+  function addToCart(name, price) {
+    const existing = cart.find(c => c.name === name);
+    if (existing) {
+      existing.qty += 1;
+      existing.total = existing.qty * price;
+    } else {
+      cart.push({ name, price, qty: 1, total: price });
+    }
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const box = document.getElementById('cartItems');
+    let total = 0;
+    if (cart.length === 0) {
+      box.innerHTML = 'No items added.';
+      document.getElementById('cartTotal').innerText = '0';
+      return;
+    }
+    box.innerHTML = cart.map(i => {
+      total += i.total;
+      return `<div class="cart-item-row"><span>${i.qty}x ${i.name}</span> <span>Rs. ${i.total}</span></div>`;
+    }).join('');
+    document.getElementById('cartTotal').innerText = total;
+  }
+
+  async function submitOnlineOrder() {
+    if (!activeCustomer) return alert("Please log in first.");
+    const address = document.getElementById('custAddress').value.trim();
+    if (cart.length === 0) return alert("Cart is empty.");
+
+    const orderData = {
+      orderId: Math.floor(1000 + Math.random() * 9000),
+      timestamp: new Date().toLocaleString(),
+      customerName: activeCustomer.name,
+      phone: activeCustomer.phone,
+      address: address,
+      items: [...cart],
+      totalAmount: cart.reduce((acc, i) => acc + i.total, 0),
+      acknowledged: false,
+      status: 'Pending at Cafe POS...'
+    };
+
+    try {
+      let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+      let data = await res.json();
+      let record = data.record || {};
+      
+      let existingOrders = record.orders || [];
+      existingOrders.push(orderData);
+      record.orders = existingOrders;
+
+      await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+        body: JSON.stringify(record)
+      });
+
+      let localOrders = JSON.parse(localStorage.getItem('myCafeOrders') || '[]');
+      localOrders.unshift(orderData);
+      localStorage.setItem('myCafeOrders', JSON.stringify(localOrders));
+
+      cart = [];
+      updateCartUI();
+      document.getElementById('custAddress').value = '';
+
+      renderMyOrdersHistory();
+      alert("✅ Order submitted to MR FOOD CAFE NAVEED POS!");
+      switchView('ordersView');
+    } catch (e) {
+      alert("Error submitting order.");
+    }
+  }
+
+  function renderMyOrdersHistory() {
+    const container = document.getElementById('myOrdersHistory');
+    let localOrders = JSON.parse(localStorage.getItem('myCafeOrders') || '[]');
+    if (activeCustomer) localOrders = localOrders.filter(o => String(o.phone) === String(activeCustomer.phone));
+
+    if (localOrders.length === 0) {
+      container.innerHTML = '<div class="info-panel"><p>No order history found for this phone number.</p></div>';
+      return;
+    }
+
+    container.innerHTML = localOrders.map(o => `
+      <div class="info-panel" style="border-left: 4px solid ${o.acknowledged ? 'var(--success)' : 'var(--cantaloupe)'}">
+        <div style="display:flex; justify-content:space-between; font-weight:bold;">
+          <span>Order #${o.orderId}</span>
+          <span style="color:var(--cantaloupe-dark);">Rs. ${o.totalAmount}</span>
+        </div>
+        <div style="font-size:11px; color:#777;">📅 ${o.timestamp}</div>
+        <div style="font-size:12px; font-weight:bold; color:${o.acknowledged ? 'var(--success)' : '#e67e22'}; margin: 4px 0;">
+          Status: ${o.status || 'Pending at Cafe POS...'}
+        </div>
+        <div style="font-size:12px; border-top:1px dashed #ccc; padding-top:5px;">
+          ${o.items.map(i => `<div style="display:flex; justify-content:space-between;"><span>${i.qty}x ${i.name}</span><span>Rs.${i.total}</span></div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.onload = () => {
+    checkCustomerSession();
+    loadDataAutomatically();
+    setInterval(loadDataAutomatically, 7000);
+  };
+</script>
+</body>
+</html>
