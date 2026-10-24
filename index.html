@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ea580c">
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js');
-    });
-  }
-</script>
-
   <meta charset="UTF-8">
   <title>MR FOOD CAFE NAVEED - Order Fast Food Online Bhiria Road</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- PWA Manifest & Custom Logo Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/jpeg" sizes="192x192" href="icon-192.png.jpg">
+  <link rel="apple-touch-icon" href="icon-192.png.jpg">
+  <meta name="theme-color" content="#D4AF37">
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
+
   <!-- Google Search Console Verification -->
   <meta name="google-site-verification" content="INVN2X4SAWOdcBRiE-AVK_jlTawIHwY_F7QM5Y75raw" />
 
@@ -29,12 +33,10 @@
   <meta property="og:description" content="We make fast food in premier taste. Fresh, fast home delivery in Bhiria Road Sindh, Pakistan.">
   <meta property="og:type" content="website">
 
-  <!-- Progressive Web App (PWA) Tags for Google Chrome & Mobile Home Screen App ("Mr F") -->
-  <meta name="theme-color" content="#FDA172">
+  <!-- Apple Mobile Web App Settings ("Mr F") -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mr F">
-  <link rel="manifest" href="data:application/json,{%22name%22:%22Mr%20F%22,%22short_name%22:%22Mr%20F%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22#FAF6F2%22,%22theme_color%22:%22#FDA172%22}">
 
   <style>
     :root {
