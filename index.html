@@ -43,18 +43,18 @@
       --watermelon: #E63946;
       --watermelon-dark: #C52233;
       --watermelon-light: #FFECEE;
-      --bg-dark: #121212;
+      --bg-snow: #FFFAFA;
       --card-bg: #FFFFFF;
       --text-dark: #1D1D1D;
-      --text-light: #FFFFFF;
+      --text-muted: #555555;
       --black: #000000;
       --white: #FFFFFF;
       --border-color: #E0E0E0;
       --success: #2ECC71;
     }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-dark); margin: 0; padding: 0; color: var(--text-dark); min-height: 100vh; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-snow); margin: 0; padding: 0; color: var(--text-dark); min-height: 100vh; }
     
-    .header { background: linear-gradient(135deg, var(--watermelon), var(--watermelon-dark)); color: var(--white); padding: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; border-bottom: 2px solid var(--black); }
+    .header { background: linear-gradient(135deg, var(--watermelon), var(--watermelon-dark)); color: var(--white); padding: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; border-bottom: 2px solid var(--black); }
     .header-top { display: flex; align-items: center; justify-content: space-between; }
     .header-left { display: flex; align-items: center; gap: 12px; }
     
@@ -62,8 +62,8 @@
     .hamburger:active { transform: scale(0.85); }
     .brand-title { font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
 
-    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 998; }
-    .sidebar-drawer { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--white); z-index: 999; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 998; }
+    .sidebar-drawer { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--white); z-index: 999; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.3); }
     .sidebar-drawer.open { left: 0; }
     .sidebar-header { background: linear-gradient(135deg, var(--watermelon), var(--watermelon-dark)); color: var(--white); padding: 25px 20px; position: relative; }
     .sidebar-header h2 { margin: 0; font-size: 18px; }
@@ -80,31 +80,31 @@
     .container { max-width: 600px; margin: 15px auto; padding: 0 15px; box-sizing: border-box; }
     .page-view { display: none; }
     .page-view.active { display: block; }
-    .section-title { font-size: 18px; font-weight: bold; color: var(--white); margin-bottom: 15px; border-bottom: 2px solid var(--watermelon); padding-bottom: 6px; }
+    .section-title { font-size: 18px; font-weight: bold; color: var(--watermelon-dark); margin-bottom: 15px; border-bottom: 2px solid var(--watermelon); padding-bottom: 6px; }
 
-    .menu-card { background: var(--card-bg); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .menu-card { background: var(--card-bg); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
     .item-img { width: 75px; height: 75px; object-fit: cover; border-radius: 50%; background: var(--watermelon-light); border: 2px solid var(--watermelon); flex-shrink: 0; }
     .menu-card-info { flex: 1; }
     .menu-card-info h3 { margin: 0 0 3px 0; font-size: 16px; color: var(--text-dark); }
     .price-tag { font-weight: bold; color: var(--watermelon); font-size: 15px; margin-top: 4px; }
     
-    .btn-add { background: var(--watermelon); color: var(--white); border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.1s ease; box-shadow: 0 2px 6px rgba(230,57,70,0.4); user-select: none; }
+    .btn-add { background: var(--watermelon); color: var(--white); border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.1s ease; box-shadow: 0 2px 6px rgba(230,57,70,0.3); user-select: none; }
     .btn-add:hover { background: var(--watermelon-dark); }
     .btn-add:active { transform: scale(0.92); }
 
-    .cart-box { background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-    .cart-item-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+    .cart-box { background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .cart-item-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 6px; }
     label { font-size: 12px; font-weight: bold; margin-top: 10px; display: block; color: var(--text-dark); }
     label .required-star { color: var(--watermelon); }
     input, textarea { width: 100%; padding: 10px; margin-top: 4px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; outline: none; background: #fff; color: #000; }
-    input:focus, textarea:focus { border-color: var(--watermelon); }
+    input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.15); }
     
     .btn-submit { background: var(--success); color: var(--white); border: none; width: 100%; padding: 12px; font-weight: bold; font-size: 15px; border-radius: 8px; cursor: pointer; margin-top: 15px; box-shadow: 0 3px 10px rgba(46,204,113,0.3); transition: all 0.1s ease; user-select: none; }
     .btn-submit:hover { background: #27ae60; }
     .btn-submit:active { transform: translateY(2px) scale(0.98); }
 
-    .info-panel { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); color: var(--text-dark); }
-    .footer-text { text-align: center; font-size: 12px; color: #aaa; margin-top: 25px; line-height: 1.6; }
+    .info-panel { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); color: var(--text-dark); }
+    .footer-text { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 25px; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -120,7 +120,7 @@
         <button class="hamburger" onclick="toggleSidebar()">☰</button>
         <div class="brand-title">MR FOOD CAFE NAVEED</div>
       </div>
-      <div style="font-size: 11px; background: rgba(0,0,0,0.4); color: white; padding: 4px 10px; border-radius: 15px; font-weight: 600; border: 1px solid var(--watermelon);">Premier Taste</div>
+      <div style="font-size: 11px; background: rgba(0,0,0,0.25); color: white; padding: 4px 10px; border-radius: 15px; font-weight: 600; border: 1px solid rgba(255,255,255,0.3);">Premier Taste</div>
     </div>
   </div>
 
@@ -146,12 +146,12 @@
     <!-- Menu View -->
     <div id="menuView" class="page-view active">
       <div class="section-title">Full Ordering Menu</div>
-      <div id="menuList" style="color:white;">Loading menu from cafe cloud...</div>
+      <div id="menuList">Loading menu from cafe cloud...</div>
 
       <div class="cart-box">
         <div class="section-title" style="font-size:15px; border-bottom:1px dashed var(--watermelon); color:var(--watermelon-dark);">Order Summary</div>
         <div id="cartItems" style="font-size:13px; color:#555; margin:10px 0;">No items added.</div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:15px; margin-bottom:10px; color:var(--watermelon);">
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:15px; margin-bottom:10px; color:var(--watermelon-dark);">
           <span>Total Amount:</span>
           <span>Rs. <span id="cartTotal">0</span></span>
         </div>
@@ -169,7 +169,7 @@
     <!-- Deals View -->
     <div id="dealsView" class="page-view">
       <div class="section-title">Special Deals & Offers</div>
-      <div id="dealsList" style="color:white;">Loading active deals...</div>
+      <div id="dealsList">Loading active deals...</div>
     </div>
 
     <!-- Track Order View -->
@@ -180,7 +180,7 @@
         <input type="text" id="trackPhoneInput" placeholder="e.g. 03001234567">
         <button class="btn-submit" style="background:var(--watermelon); margin-top:10px;" onclick="renderMyOrdersHistory()">🔍 Track Orders Status</button>
       </div>
-      <div id="myOrdersHistory" style="color:white;">Enter your phone number above to view live status.</div>
+      <div id="myOrdersHistory">Enter your phone number above to view live status.</div>
     </div>
 
     <!-- Contact View -->
@@ -202,7 +202,7 @@
     </div>
 
     <div class="footer-text">
-      <p style="font-weight:bold; color:white;">MR FOOD CAFE NAVEED — We deliver the taste</p>
+      <p style="font-weight:bold; color:var(--text-dark);">MR FOOD CAFE NAVEED — We deliver the taste</p>
       <p>📍 Bhiria Road Sindh, Pakistan</p>
     </div>
   </div>
@@ -287,7 +287,7 @@
         <div class="menu-card" style="border-left: 4px solid var(--watermelon);">
           <img src="${d.image || defaultFoodImg}" class="item-img" alt="${d.title}">
           <div class="menu-card-info">
-            <h3 style="color:var(--watermelon);">${d.title}</h3>
+            <h3 style="color:var(--watermelon-dark);">${d.title}</h3>
             <div class="price-tag">Deal Price: Rs. ${d.price}</div>
           </div>
           <button class="btn-add" onclick="addDealToCart('${d.title}', ${d.price})">+ Add Deal</button>
@@ -426,7 +426,7 @@
         <div class="info-panel" style="border-left: 4px solid ${o.acknowledged ? 'var(--success)' : 'var(--watermelon)'}">
           <div style="display:flex; justify-content:space-between; font-weight:bold;">
             <span>Order #${o.orderId}</span>
-            <span style="color:var(--watermelon);">Rs. ${o.totalAmount}</span>
+            <span style="color:var(--watermelon-dark);">Rs. ${o.totalAmount}</span>
           </div>
           <div style="font-size:11px; color:#777;">📅 ${o.timestamp}</div>
           <div style="font-size:13px; font-weight:bold; color:${o.acknowledged ? 'var(--success)' : '#e67e22'}; margin: 6px 0;">
