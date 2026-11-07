@@ -25,7 +25,7 @@
   <!-- Google Search Console Verification -->
   <meta name="google-site-verification" content="INVN2X4SAWOdcBRiE-AVK_jlTawIHwY_F7QM5Y75raw" />
 
-  <!-- SEO & Search Engine Optimization Tags for Google Ranking -->
+  <!-- SEO & Search Engine Optimization Tags -->
   <meta name="description" content="Order fresh fast food online from MR FOOD CAFE NAVEED in Bhiria Road, Sindh. Delicious Zinger Burgers, Fries, Deals & Fast Home Delivery.">
   <meta name="keywords" content="MR FOOD CAFE NAVEED, MR FOOD CAFE, Bhiria Road food delivery, fast food Bhiria Road, order online Bhiria Road, Zinger burger Bhiria Road">
   <meta name="author" content="MR FOOD CAFE NAVEED">
@@ -177,13 +177,14 @@
 
     <!-- Track Order View -->
     <div id="ordersView" class="page-view">
-      <div class="section-title">Track Today's Orders</div>
+      <div class="section-title">Track My Orders</div>
       <div class="info-panel">
-        <label>Enter Mobile Number to Track Today's Orders:</label>
+        <label>Enter Mobile Number to Track Orders:</label>
         <input type="text" id="trackPhoneInput" placeholder="e.g. 03001234567">
-        <button class="btn-submit" style="background:var(--watermelon); margin-top:10px;" onclick="renderMyOrdersHistory()">🔍 Track Today's Status</button>
+        <!-- RENAMED BUTTON BELOW -->
+        <button class="btn-submit" style="background:var(--watermelon); margin-top:10px;" onclick="renderMyOrdersHistory()">🔍 Track Order Status</button>
       </div>
-      <div id="myOrdersHistory">Enter your phone number above to view current day status.</div>
+      <div id="myOrdersHistory">Enter your phone number above to view current order status.</div>
     </div>
 
     <!-- Contact View -->
@@ -260,7 +261,7 @@
       if (data && data.data) {
         cafeMenu = data.data.menu || [];
         
-        // Filter out expired deals automatically based on current date
+        // Auto-filter out expired deals
         const rawDeals = data.data.deals || [];
         const todayStr = new Date().toISOString().slice(0, 10);
         cafeDeals = rawDeals.filter(d => !d.validUntil || d.validUntil >= todayStr);
@@ -367,7 +368,7 @@
     const orderData = {
       orderId: orderIdNum,
       timestamp: new Date().toLocaleString(),
-      rawDate: new Date().toISOString().slice(0, 10), // Current date format YYYY-MM-DD for tracking filter
+      rawDate: new Date().toISOString().slice(0, 10),
       customerName: name,
       phone: phone,
       address: address,
@@ -388,7 +389,7 @@
       await db.from('cafe_store').upsert({ id: 1, data: record });
 
       // ── WHATSAPP OWNER NOTIFICATION ──
-      const ownerWhatsApp = "923000878384"; // Owner phone number
+      const ownerWhatsApp = "923000878384";
       const itemsListStr = orderData.items.map(i => `${i.qty}x ${i.name} (Rs.${i.total})`).join(', ');
       const whatsappMessage = `🚨 *NEW ONLINE ORDER!* 🛵\n\n*Order #:* ${orderIdNum}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
       
@@ -429,14 +430,14 @@
       let completedList = record.completedOrders || [];
       const todayDateStr = new Date().toISOString().slice(0, 10);
 
-      // Filter STRICTLY for today's orders matching customer phone
+      // Filter strictly for current date matching user phone
       let userPending = pendingList.filter(o => String(o.phone) === String(inputPhone) && (!o.rawDate || o.rawDate === todayDateStr));
       let userCompleted = completedList.filter(o => String(o.phone) === String(inputPhone) && (o.completedAt && o.completedAt.slice(0, 10) === todayDateStr));
 
       let allUserOrders = [...userPending, ...userCompleted];
 
       if (allUserOrders.length === 0) {
-        container.innerHTML = '<div class="info-panel"><p>No orders found for mobile number: <b>' + inputPhone + '</b> for today.</p></div>';
+        container.innerHTML = '<div class="info-panel"><p>No active orders found for mobile number: <b>' + inputPhone + '</b> for today.</p></div>';
         return;
       }
 
