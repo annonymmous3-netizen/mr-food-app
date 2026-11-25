@@ -210,6 +210,8 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 
 .footer-text { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 25px; line-height: 1.6; }
 
+
+.license-banner{display:none;margin:10px 15px;padding:12px;border-radius:10px;background:#fff3cd;color:#6b5200;border:1px solid #e4c766;font-size:13px;line-height:1.5}.license-banner.expired{background:#fde7e5;color:#8b2118;border-color:#e5aaa4}.license-card{display:none;margin:12px 15px;padding:16px;border-radius:12px;background:#fff;border:2px solid #12345b;box-shadow:0 8px 24px rgba(0,0,0,.08)}.license-card input{width:100%;padding:11px;border:1px solid #ccd5df;border-radius:8px;margin:8px 0}.license-btn{background:#12345b;color:#fff;border:0;padding:11px 14px;border-radius:8px;font-weight:700;width:100%}
 </style>
 
 </head>
@@ -246,7 +248,15 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 
 </div>
 
-
+<div id="tableOrderBadge" style="display:none; background:#FFF3CD; color:#7A5B00; border:1px solid #F0D98A; margin:10px 15px 0; padding:9px 12px; border-radius:10px; text-align:center; font-weight:700; font-size:14px;">🍽️ Table Order</div>
+<div id="licenseBanner" class="license-banner"></div>
+<div id="licenseCard" class="license-card">
+  <div style="font-size:18px;font-weight:800;color:#12345b;margin-bottom:5px;">Website Activation</div>
+  <div id="licenseCardText" style="font-size:13px;color:#555;line-height:1.5;margin-bottom:8px;"></div>
+  <input id="customerLicenseCode" placeholder="MFC-XXXX-XXXX-XXXX" autocomplete="off">
+  <button class="license-btn" onclick="activateCustomerSite()">Activate Website</button>
+  <div style="font-size:11px;color:#777;margin-top:8px;text-align:center;">Activation code اپنے developer / NOVA WEB DEVELOPER سے حاصل کریں۔</div>
+</div>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -320,7 +330,7 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 
 <input type="text" id="custPhone" placeholder="e.g. 03001234567">
 
-<label>Delivery Address <span class="required-star">*</span>:</label>
+<label for="custAddress">Delivery Address <span class="required-star">*</span>:</label>
 
 <textarea id="custAddress" placeholder="House / Street details" rows="2"></textarea>
 
@@ -426,6 +436,40 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const LICENSE_SITE_URL = window.location.origin.replace(/\/$/, '');
+let licenseState = {status:'UNKNOWN', active_until:null, days_left:0};
+let licenseActive = false;
+
+async function checkCustomerLicense(){
+  try{
+    const {data,error}=await db.rpc('check_site_license',{p_site_url:LICENSE_SITE_URL});
+    if(error) throw error;
+    const row=Array.isArray(data)?data[0]:data;
+    licenseState=row||{status:'INACTIVE',active_until:null,days_left:0};
+    licenseActive=licenseState.status==='ACTIVE';
+    const banner=document.getElementById('licenseBanner'),card=document.getElementById('licenseCard'),cardText=document.getElementById('licenseCardText');
+    if(licenseActive){
+      if(licenseState.days_left<=5){banner.style.display='block';banner.textContent=`⚠️ اس website کی activation ${licenseState.active_until} کو ختم ہو رہی ہے۔ صرف ${licenseState.days_left} دن باقی ہیں۔ آخری تاریخ ${licenseState.active_until} ہے۔ نیا activation code حاصل کر لیں۔`;}else banner.style.display='none';
+      card.style.display='none';
+      return true;
+    }
+    banner.style.display='block';banner.className='license-banner expired';
+    banner.textContent=licenseState.status==='EXPIRED'?`🔴 اس website کی activation ${licenseState.active_until} کو expire ہو چکی ہے۔`: '🟠 یہ website ابھی activate نہیں ہوئی۔';
+    card.style.display='block';
+    cardText.textContent=licenseState.status==='EXPIRED'?`براہِ کرم اپنے developer سے نیا activation code حاصل کریں اور یہاں درج کریں۔`:`Website استعمال کرنے کے لیے پہلے activation code درج کریں۔`;
+    return false;
+  }catch(e){
+    licenseActive=false;
+    const banner=document.getElementById('licenseBanner'); if(banner){banner.style.display='block';banner.className='license-banner expired';banner.textContent='⚠️ Activation service دستیاب نہیں۔ براہِ کرم Internet چیک کریں۔';}
+    return false;
+  }
+}
+
+async function activateCustomerSite(){
+  const code=document.getElementById('customerLicenseCode').value.trim(); if(!code)return alert('Activation code درج کریں۔');
+  try{const {data,error}=await db.rpc('activate_site_license',{p_site_url:LICENSE_SITE_URL,p_code:code});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row||!row.success)return alert(row?.message||'Activation code درست نہیں ہے۔');alert(`✅ Website activate ہو گئی۔ ${row.active_until} تک فعال ہے۔ اگلی renewal کے لیے نیا code حاصل کریں۔`);document.getElementById('customerLicenseCode').value='';await checkCustomerLicense();if(licenseActive)loadDataAutomatically();}catch(e){alert('Activation service error: '+(e.message||e));}
+}
+
 
 
 
@@ -438,6 +482,11 @@ let contactPhone = '03000878384';
 let cart = [];
 
 let deferredPrompt;
+
+// QR Table Ordering Context
+const tableParam = new URLSearchParams(window.location.search).get('table');
+const tableNumber = tableParam && /^([1-9]|1[0-2])$/.test(tableParam) ? parseInt(tableParam, 10) : null;
+const isTableOrder = Number.isInteger(tableNumber);
 
 const defaultFoodImg = 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150';
 
@@ -500,7 +549,28 @@ if (document.getElementById('sidebarDrawer').classList.contains('open')) toggleS
 
 
 
+function applyTableOrderMode() {
+const badge = document.getElementById('tableOrderBadge');
+const addressLabel = document.querySelector('label[for="custAddress"]');
+const addressInput = document.getElementById('custAddress');
+if (!badge) return;
+if (isTableOrder) {
+  badge.style.display = 'block';
+  badge.innerText = `🍽️ Table ${tableNumber} — Order From Your Table`;
+  if (addressLabel) addressLabel.style.display = 'none';
+  if (addressInput) {
+    addressInput.style.display = 'none';
+    addressInput.removeAttribute('required');
+    addressInput.value = `Table ${tableNumber}`;
+  }
+} else {
+  badge.style.display = 'none';
+}
+}
+
 async function loadDataAutomatically() {
+
+if (!licenseActive) { renderAllViews(); return; }
 
 try {
 
@@ -695,6 +765,8 @@ document.getElementById('cartTotal').innerText = total;
 
 async function submitOnlineOrder() {
 
+if (!licenseActive) { alert("Website activation required. براہِ کرم activation code درج کریں۔"); return; }
+
 if (cart.length === 0) return alert("Please add at least one item to your cart before submitting.");
 
 
@@ -707,19 +779,24 @@ const address = document.getElementById('custAddress').value.trim();
 
 
 
-if (!name || !phone || !address) {
+if (!name || !phone || (!isTableOrder && !address)) {
 
-return alert("⚠️ All details are mandatory!\nPlease enter your Full Name, Mobile Phone Number, and Delivery Address to place the order.");
+return alert(isTableOrder
+  ? "⚠️ Please enter your Full Name and Mobile Phone Number to place your table order."
+  : "⚠️ All details are mandatory!\nPlease enter your Full Name, Mobile Phone Number, and Delivery Address to place the order.");
 
 }
 
 
 
-const orderIdNum = Math.floor(1000 + Math.random() * 9000);
+const sourceOrderId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `ORD-${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
 
 const orderData = {
 
-orderId: orderIdNum,
+// POS assigns the single shared invoice sequence when this order reaches the live POS.
+orderId: null,
+sourceOrderId: sourceOrderId,
+invoiceAssigned: false,
 
 timestamp: new Date().toLocaleString(),
 
@@ -729,7 +806,11 @@ customerName: name,
 
 phone: phone,
 
-address: address,
+tableNumber: isTableOrder ? tableNumber : null,
+
+orderType: isTableOrder ? 'table' : 'delivery',
+
+address: isTableOrder ? `Table ${tableNumber}` : address,
 
 items: [...cart],
 
@@ -766,7 +847,7 @@ const ownerWhatsApp = "923000878384";
 
 const itemsListStr = orderData.items.map(i => `${i.qty}x ${i.name} (Rs.${i.total})`).join(', ');
 
-const whatsappMessage = `🚨 *NEW ONLINE ORDER!* 🛵\n\n*Order #:* ${orderIdNum}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
+const whatsappMessage = `🚨 *NEW ONLINE ORDER!* ${isTableOrder ? '🍽️' : '🛵'}\n\n*Order #:* ${orderIdNum}\n*Type:* ${isTableOrder ? `Table ${tableNumber}` : 'Home Delivery'}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address/Table:* ${orderData.address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
 
 
 window.open(`https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
@@ -900,8 +981,10 @@ container.innerHTML = '<div class="info-panel"><p>Error fetching orders status.<
 
 
 
-window.onload = () => {
+window.onload = async () => {
 
+applyTableOrderMode();
+await checkCustomerLicense();
 loadDataAutomatically();
 
 setInterval(loadDataAutomatically, 7000);
