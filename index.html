@@ -255,7 +255,7 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
   <div id="licenseCardText" style="font-size:13px;color:#555;line-height:1.5;margin-bottom:8px;"></div>
   <input id="customerLicenseCode" placeholder="MFC-XXXX-XXXX-XXXX" autocomplete="off">
   <button class="license-btn" onclick="activateCustomerSite()">Activate Website</button>
-  <div style="font-size:11px;color:#777;margin-top:8px;text-align:center;">Activation code اپنے developer / NOVA WEB DEVELOPER سے حاصل کریں۔</div>
+  <div style="font-size:11px;color:#777;margin-top:8px;text-align:center;">Activation code   developer / NOVA WEB DEVELOPER      </div>
 </div>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -287,6 +287,8 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 <div class="nav-link" id="nav-contactView" onclick="switchView('contactView', this)">📞 Contact</div>
 
 <div class="nav-link" id="nav-aboutView" onclick="switchView('aboutView', this)">ℹ️ About Us</div>
+<div class="nav-section-title" style="margin-top:10px;">ACCOUNT</div>
+<div class="nav-link" id="nav-subscriptionView" onclick="switchView('subscriptionView', this)">💳 Subscription Status</div>
 
 </div>
 
@@ -412,6 +414,15 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 
 
 
+<div id="subscriptionView" class="page-view">
+<div class="section-title">Subscription & Activation Status</div>
+<div class="info-panel" style="border:2px solid #12345b;">
+<h3 style="margin-top:0;color:#12345b;">MR FOOD CAFE NAVEED — Website Subscription</h3>
+<div id="subscriptionStatusCard" style="font-size:14px;line-height:1.8;">Status        ...</div>
+<div style="margin-top:12px;"><label>Activation Code:</label><input type="text" id="subscriptionCodeInput" placeholder="NOVA-XXXX-XXXX-XXXX"><button class="btn-submit" style="background:#12345b" onclick="activateCustomerSiteFromSubscription()">Activate / Renew Website</button></div>
+<p style="font-size:12px;color:#666;margin-bottom:0;">Activation code   developer <b>NOVA WEB DEVELOPER</b>      </p>
+</div></div>
+
 <div class="footer-text">
 
 <p style="font-weight:bold; color:var(--text-dark);">MR FOOD CAFE NAVEED — We deliver the taste</p>
@@ -436,40 +447,54 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const LICENSE_SUPABASE_URL = 'https://ixmiwgolmklrqenwflub.supabase.co';
+const LICENSE_SUPABASE_ANON_KEY = 'sb_publishable_30FTYbUsJSxENE6zXFXatw_ySKKcWzB';
+const licenseDb = createClient(LICENSE_SUPABASE_URL, LICENSE_SUPABASE_ANON_KEY);
 const LICENSE_SITE_URL = window.location.origin.replace(/\/$/, '');
 let licenseState = {status:'UNKNOWN', active_until:null, days_left:0};
 let licenseActive = false;
 
 async function checkCustomerLicense(){
   try{
-    const {data,error}=await db.rpc('check_site_license',{p_site_url:LICENSE_SITE_URL});
+    const {data,error}=await licenseDb.rpc('check_site_license',{p_site_url:LICENSE_SITE_URL});
     if(error) throw error;
     const row=Array.isArray(data)?data[0]:data;
     licenseState=row||{status:'INACTIVE',active_until:null,days_left:0};
     licenseActive=licenseState.status==='ACTIVE';
     const banner=document.getElementById('licenseBanner'),card=document.getElementById('licenseCard'),cardText=document.getElementById('licenseCardText');
     if(licenseActive){
-      if(licenseState.days_left<=5){banner.style.display='block';banner.textContent=`⚠️ اس website کی activation ${licenseState.active_until} کو ختم ہو رہی ہے۔ صرف ${licenseState.days_left} دن باقی ہیں۔ آخری تاریخ ${licenseState.active_until} ہے۔ نیا activation code حاصل کر لیں۔`;}else banner.style.display='none';
+      if(licenseState.days_left<=5){banner.style.display='block';banner.className='license-banner';banner.textContent=`⚠️ This website activation ${licenseState.active_until} expires on. Only ${licenseState.days_left} days remain. Expiry date ${licenseState.active_until}   Get a new activation code.`;}else banner.style.display='none';
       card.style.display='none';
+      renderSubscriptionStatus();
+      if(licenseState.days_left<=5 && 'Notification' in window && Notification.permission==='granted') new Notification('MR FOOD CAFE NAVEED — Renewal Reminder',{body:`    website activation     ${licenseState.days_left} days remain. Expiry date ${licenseState.active_until}  `});
       return true;
     }
     banner.style.display='block';banner.className='license-banner expired';
-    banner.textContent=licenseState.status==='EXPIRED'?`🔴 اس website کی activation ${licenseState.active_until} کو expire ہو چکی ہے۔`: '🟠 یہ website ابھی activate نہیں ہوئی۔';
+    banner.textContent=licenseState.status==='EXPIRED'?`🔴 This website activation ${licenseState.active_until}   expire      `: '🟠   website   activate    ';
     card.style.display='block';
-    cardText.textContent=licenseState.status==='EXPIRED'?`براہِ کرم اپنے developer سے نیا activation code حاصل کریں اور یہاں درج کریں۔`:`Website استعمال کرنے کے لیے پہلے activation code درج کریں۔`;
+    cardText.textContent=licenseState.status==='EXPIRED'?`      developer     activation code            `:`Enter an activation code to activate this website.`;
     return false;
   }catch(e){
     licenseActive=false;
-    const banner=document.getElementById('licenseBanner'); if(banner){banner.style.display='block';banner.className='license-banner expired';banner.textContent='⚠️ Activation service دستیاب نہیں۔ براہِ کرم Internet چیک کریں۔';}
+    const banner=document.getElementById('licenseBanner'); if(banner){banner.style.display='block';banner.className='license-banner expired';banner.textContent='⚠️ Activation service unavailable. Please check your internet connection.';}
     return false;
   }
 }
 
 async function activateCustomerSite(){
-  const code=document.getElementById('customerLicenseCode').value.trim(); if(!code)return alert('Activation code درج کریں۔');
-  try{const {data,error}=await db.rpc('activate_site_license',{p_site_url:LICENSE_SITE_URL,p_code:code});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row||!row.success)return alert(row?.message||'Activation code درست نہیں ہے۔');alert(`✅ Website activate ہو گئی۔ ${row.active_until} تک فعال ہے۔ اگلی renewal کے لیے نیا code حاصل کریں۔`);document.getElementById('customerLicenseCode').value='';await checkCustomerLicense();if(licenseActive)loadDataAutomatically();}catch(e){alert('Activation service error: '+(e.message||e));}
+  const code=document.getElementById('customerLicenseCode').value.trim(); if(!code)return alert('Activation code    ');
+  try{const {data,error}=await licenseDb.rpc('activate_site_license',{p_site_url:LICENSE_SITE_URL,p_code:code});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row||!row.success)return alert(row?.message||'Activation code      ');alert(`✅ Website activate     ${row.active_until}         renewal       code    `);document.getElementById('customerLicenseCode').value='';await checkCustomerLicense();if(licenseActive)loadDataAutomatically();}catch(e){alert('Activation service error: '+(e.message||e));}
 }
 
+function renderSubscriptionStatus(){
+  const el=document.getElementById('subscriptionStatusCard'); if(!el)return;
+  const s=licenseState.status||'UNKNOWN';
+  if(s==='ACTIVE'){
+    const cls=licenseState.days_left<=5?'#b06a00':'#16845c';
+    el.innerHTML=`<div style="font-size:18px;font-weight:800;color:${cls}">🟢 ACTIVE</div><div>Expiry / Renewal Date: <b>${licenseState.active_until}</b></div><div>Remaining Days: <b>${licenseState.days_left}</b></div><div style="margin-top:6px;color:#666">${licenseState.days_left<=5?'⚠️ Renewal is due soon — obtain a new activation code from your developer.':'Your website is fully active.'}</div>`;
+  }else if(s==='EXPIRED'){el.innerHTML=`<div style="font-size:18px;font-weight:800;color:#c0392b">🔴 EXPIRED</div><div>Expired On: <b>${licenseState.active_until||'—'}</b></div><div style="margin-top:6px">Please obtain a new activation code from NOVA WEB DEVELOPER.</div>`;}else{el.innerHTML='<div style="font-size:18px;font-weight:800;color:#b06a00">🟠 NOT ACTIVATED</div><div>Website activation code has not been entered yet.</div>';}
+}
+async function activateCustomerSiteFromSubscription(){const code=document.getElementById('subscriptionCodeInput').value.trim();if(!code)return alert('Activation code    ');await activateCustomerSite();await checkCustomerLicense();renderSubscriptionStatus();}
 
 
 
@@ -544,6 +569,7 @@ document.getElementById(viewId).classList.add('active');
 if (element) element.classList.add('active');
 
 if (document.getElementById('sidebarDrawer').classList.contains('open')) toggleSidebar();
+if(viewId==='subscriptionView' && 'Notification' in window && Notification.permission==='default') Notification.requestPermission().catch(()=>{});
 
 }
 
@@ -765,7 +791,7 @@ document.getElementById('cartTotal').innerText = total;
 
 async function submitOnlineOrder() {
 
-if (!licenseActive) { alert("Website activation required. براہِ کرم activation code درج کریں۔"); return; }
+if (!licenseActive) { alert("Website activation required.     activation code    "); return; }
 
 if (cart.length === 0) return alert("Please add at least one item to your cart before submitting.");
 
@@ -847,7 +873,7 @@ const ownerWhatsApp = "923000878384";
 
 const itemsListStr = orderData.items.map(i => `${i.qty}x ${i.name} (Rs.${i.total})`).join(', ');
 
-const whatsappMessage = `🚨 *NEW ONLINE ORDER!* ${isTableOrder ? '🍽️' : '🛵'}\n\n*Order #:* ${orderIdNum}\n*Type:* ${isTableOrder ? `Table ${tableNumber}` : 'Home Delivery'}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address/Table:* ${orderData.address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
+const whatsappMessage = `🚨 *NEW ONLINE ORDER!* ${isTableOrder ? '🍽️' : '🛵'}\n\n*Source Order:* ${sourceOrderId.slice(0,8)}\n*Type:* ${isTableOrder ? `Table ${tableNumber}` : 'Home Delivery'}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address/Table:* ${orderData.address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
 
 
 window.open(`https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
