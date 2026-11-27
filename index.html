@@ -212,6 +212,12 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 
 
 .license-banner{display:none;margin:10px 15px;padding:12px;border-radius:10px;background:#fff3cd;color:#6b5200;border:1px solid #e4c766;font-size:13px;line-height:1.5}.license-banner.expired{background:#fde7e5;color:#8b2118;border-color:#e5aaa4}.license-card{display:none;margin:12px 15px;padding:16px;border-radius:12px;background:#fff;border:2px solid #12345b;box-shadow:0 8px 24px rgba(0,0,0,.08)}.license-card input{width:100%;padding:11px;border:1px solid #ccd5df;border-radius:8px;margin:8px 0}.license-btn{background:#12345b;color:#fff;border:0;padding:11px 14px;border-radius:8px;font-weight:700;width:100%}
+
+/* Subscription & Table Order additions */
+.subscription-card{background:linear-gradient(135deg,#fff,#f7fbff);border:1px solid #d7e7f2;border-radius:14px;padding:16px;margin-bottom:15px;box-shadow:0 5px 18px rgba(0,0,0,.06)}
+.subscription-status{font-weight:800;font-size:16px;margin:7px 0}.subscription-details{font-size:13px;line-height:1.8;color:#555}.table-banner{background:linear-gradient(135deg,var(--watermelon),var(--watermelon-dark));color:#fff;border-radius:12px;padding:12px 14px;margin-bottom:15px;font-weight:800;box-shadow:0 4px 12px rgba(230,57,70,.2)}
+.activation-input{margin-top:8px}.btn-activate{background:#1f6feb;color:#fff;border:none;width:100%;padding:11px;border-radius:8px;font-weight:800;cursor:pointer;margin-top:8px}
+
 </style>
 
 </head>
@@ -249,15 +255,6 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 </div>
 
 <div id="tableOrderBadge" style="display:none; background:#FFF3CD; color:#7A5B00; border:1px solid #F0D98A; margin:10px 15px 0; padding:9px 12px; border-radius:10px; text-align:center; font-weight:700; font-size:14px;">🍽️ Table Order</div>
-<div id="licenseBanner" class="license-banner"></div>
-<div id="licenseCard" class="license-card">
-  <div style="font-size:18px;font-weight:800;color:#12345b;margin-bottom:5px;">Website Activation</div>
-  <div id="licenseCardText" style="font-size:13px;color:#555;line-height:1.5;margin-bottom:8px;"></div>
-  <input id="customerLicenseCode" placeholder="MFC-XXXX-XXXX-XXXX" autocomplete="off">
-  <button class="license-btn" onclick="activateCustomerSite()">Activate Website</button>
-  <div style="font-size:11px;color:#777;margin-top:8px;text-align:center;">Activation code   developer / NOVA WEB DEVELOPER      </div>
-</div>
-
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
 <div class="sidebar-drawer" id="sidebarDrawer">
@@ -281,15 +278,11 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 <div class="nav-link" id="nav-dealsView" onclick="switchView('dealsView', this)">🏷️ Deals & Offers</div>
 
 <div class="nav-link" id="nav-ordersView" onclick="switchView('ordersView', this)">🔍 Track Order</div>
-
 <div class="nav-section-title" style="margin-top:10px;">QUERY & SUPPORT</div>
 
 <div class="nav-link" id="nav-contactView" onclick="switchView('contactView', this)">📞 Contact</div>
 
 <div class="nav-link" id="nav-aboutView" onclick="switchView('aboutView', this)">ℹ️ About Us</div>
-<div class="nav-section-title" style="margin-top:10px;">ACCOUNT</div>
-<div class="nav-link" id="nav-subscriptionView" onclick="switchView('subscriptionView', this)">💳 Subscription Status</div>
-
 </div>
 
 </div>
@@ -297,6 +290,8 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 
 
 <div class="container">
+<div id="tableBanner" class="table-banner" style="display:none"></div>
+<div id="customerOrderNotice" class="license-banner" style="display:none;position:sticky;top:0;z-index:90;text-align:center;font-weight:700;"></div>
 
 <!-- Menu View -->
 
@@ -375,9 +370,6 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 <div id="myOrdersHistory">Enter your phone number above to view current order status.</div>
 
 </div>
-
-
-
 <!-- Contact View -->
 
 <div id="contactView" class="page-view">
@@ -411,18 +403,6 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 </div>
 
 </div>
-
-
-
-<div id="subscriptionView" class="page-view">
-<div class="section-title">Subscription & Activation Status</div>
-<div class="info-panel" style="border:2px solid #12345b;">
-<h3 style="margin-top:0;color:#12345b;">MR FOOD CAFE NAVEED — Website Subscription</h3>
-<div id="subscriptionStatusCard" style="font-size:14px;line-height:1.8;">Status        ...</div>
-<div style="margin-top:12px;"><label>Activation Code:</label><input type="text" id="subscriptionCodeInput" placeholder="NOVA-XXXX-XXXX-XXXX"><button class="btn-submit" style="background:#12345b" onclick="activateCustomerSiteFromSubscription()">Activate / Renew Website</button></div>
-<p style="font-size:12px;color:#666;margin-bottom:0;">Activation code   developer <b>NOVA WEB DEVELOPER</b>      </p>
-</div></div>
-
 <div class="footer-text">
 
 <p style="font-weight:bold; color:var(--text-dark);">MR FOOD CAFE NAVEED — We deliver the taste</p>
@@ -438,65 +418,53 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 <script>
 
 // ── SUPABASE CONFIGURATION ──
-
 const SUPABASE_URL = 'https://mavjzmuathawcvuxaguo.supabase.co';
-
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hdmp6bXVhdGhhd2N2dXhhZ3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MjU4NDAsImV4cCI6MjEwOTMwMTg0MH0.M4qy0QgGgv04mP4SW-NwRNwdY5BrGV04hUDpUmg6uj0';
-
-
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtYXZqem11YXRoYXdjdXhhZ3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MjU4NDAsImV4cCI6MjEwOTMwMTg0MH0.M4qy0QgGgv04mP4SW-NwRNwdY5BrGV04hUDpUmg6ujQ';
 const { createClient } = supabase;
-
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Central licensing service: only order submission is gated. Customer browsing is never blocked.
 const LICENSE_SUPABASE_URL = 'https://ixmiwgolmklrqenwflub.supabase.co';
 const LICENSE_SUPABASE_ANON_KEY = 'sb_publishable_30FTYbUsJSxENE6zXFXatw_ySKKcWzB';
 const licenseDb = createClient(LICENSE_SUPABASE_URL, LICENSE_SUPABASE_ANON_KEY);
-const LICENSE_SITE_URL = window.location.origin.replace(/\/$/, '');
+const OWNER_LICENSE_SITE_URL = 'https://mr-food-pos.vercel.app';
 let licenseState = {status:'UNKNOWN', active_until:null, days_left:0};
-let licenseActive = false;
+let licenseCheckBusy = false;
 
 async function checkCustomerLicense(){
+  if(licenseCheckBusy) return licenseState;
+  licenseCheckBusy=true;
   try{
-    const {data,error}=await licenseDb.rpc('check_site_license',{p_site_url:LICENSE_SITE_URL});
+    const {data,error}=await licenseDb.rpc('check_site_license',{p_site_url:OWNER_LICENSE_SITE_URL});
     if(error) throw error;
     const row=Array.isArray(data)?data[0]:data;
     licenseState=row||{status:'INACTIVE',active_until:null,days_left:0};
-    licenseActive=licenseState.status==='ACTIVE';
-    const banner=document.getElementById('licenseBanner'),card=document.getElementById('licenseCard'),cardText=document.getElementById('licenseCardText');
-    if(licenseActive){
-      if(licenseState.days_left<=5){banner.style.display='block';banner.className='license-banner';banner.textContent=`⚠️ This website activation ${licenseState.active_until} expires on. Only ${licenseState.days_left} days remain. Expiry date ${licenseState.active_until}   Get a new activation code.`;}else banner.style.display='none';
-      card.style.display='none';
-      renderSubscriptionStatus();
-      if(licenseState.days_left<=5 && 'Notification' in window && Notification.permission==='granted') new Notification('MR FOOD CAFE NAVEED — Renewal Reminder',{body:`    website activation     ${licenseState.days_left} days remain. Expiry date ${licenseState.active_until}  `});
-      return true;
-    }
-    banner.style.display='block';banner.className='license-banner expired';
-    banner.textContent=licenseState.status==='EXPIRED'?`🔴 This website activation ${licenseState.active_until}   expire      `: '🟠   website   activate    ';
-    card.style.display='block';
-    cardText.textContent=licenseState.status==='EXPIRED'?`      developer     activation code            `:`Enter an activation code to activate this website.`;
-    return false;
   }catch(e){
-    licenseActive=false;
-    const banner=document.getElementById('licenseBanner'); if(banner){banner.style.display='block';banner.className='license-banner expired';banner.textContent='⚠️ Activation service unavailable. Please check your internet connection.';}
+    licenseState={status:'UNKNOWN',active_until:null,days_left:0};
+  }finally{licenseCheckBusy=false;}
+  return licenseState;
+}
+
+function showCustomerOrderNotice(message,error=false){
+  const el=document.getElementById('customerOrderNotice');
+  if(!el)return;
+  el.style.display='block';
+  el.className='license-banner'+(error?' expired':'');
+  el.textContent=message;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function clearCustomerOrderNotice(){const el=document.getElementById('customerOrderNotice');if(el)el.style.display='none';}
+
+async function verifyOrderingAvailability(){
+  const state=await checkCustomerLicense();
+  if(state.status==='ACTIVE'){clearCustomerOrderNotice();return true;}
+  if(state.status==='EXPIRED'||state.status==='INACTIVE'){
+    showCustomerOrderNotice('Sorry, online ordering is temporarily unavailable. Please try again later.');
     return false;
   }
+  showCustomerOrderNotice('Sorry, the ordering service is temporarily unavailable. It may be offline from the developer side. Please try again later.',true);
+  return false;
 }
-
-async function activateCustomerSite(){
-  const code=document.getElementById('customerLicenseCode').value.trim(); if(!code)return alert('Activation code    ');
-  try{const {data,error}=await licenseDb.rpc('activate_site_license',{p_site_url:LICENSE_SITE_URL,p_code:code});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row||!row.success)return alert(row?.message||'Activation code      ');alert(`✅ Website activate     ${row.active_until}         renewal       code    `);document.getElementById('customerLicenseCode').value='';await checkCustomerLicense();if(licenseActive)loadDataAutomatically();}catch(e){alert('Activation service error: '+(e.message||e));}
-}
-
-function renderSubscriptionStatus(){
-  const el=document.getElementById('subscriptionStatusCard'); if(!el)return;
-  const s=licenseState.status||'UNKNOWN';
-  if(s==='ACTIVE'){
-    const cls=licenseState.days_left<=5?'#b06a00':'#16845c';
-    el.innerHTML=`<div style="font-size:18px;font-weight:800;color:${cls}">🟢 ACTIVE</div><div>Expiry / Renewal Date: <b>${licenseState.active_until}</b></div><div>Remaining Days: <b>${licenseState.days_left}</b></div><div style="margin-top:6px;color:#666">${licenseState.days_left<=5?'⚠️ Renewal is due soon — obtain a new activation code from your developer.':'Your website is fully active.'}</div>`;
-  }else if(s==='EXPIRED'){el.innerHTML=`<div style="font-size:18px;font-weight:800;color:#c0392b">🔴 EXPIRED</div><div>Expired On: <b>${licenseState.active_until||'—'}</b></div><div style="margin-top:6px">Please obtain a new activation code from NOVA WEB DEVELOPER.</div>`;}else{el.innerHTML='<div style="font-size:18px;font-weight:800;color:#b06a00">🟠 NOT ACTIVATED</div><div>Website activation code has not been entered yet.</div>';}
-}
-async function activateCustomerSiteFromSubscription(){const code=document.getElementById('subscriptionCodeInput').value.trim();if(!code)return alert('Activation code    ');await activateCustomerSite();await checkCustomerLicense();renderSubscriptionStatus();}
-
-
 
 let cafeMenu = [];
 
@@ -569,7 +537,6 @@ document.getElementById(viewId).classList.add('active');
 if (element) element.classList.add('active');
 
 if (document.getElementById('sidebarDrawer').classList.contains('open')) toggleSidebar();
-if(viewId==='subscriptionView' && 'Notification' in window && Notification.permission==='default') Notification.requestPermission().catch(()=>{});
 
 }
 
@@ -594,42 +561,35 @@ if (isTableOrder) {
 }
 }
 
+function renderTableMode(){
+const banner=document.getElementById('tableBanner');
+const address=document.getElementById('custAddress');
+if(isTableOrder){
+ if(banner){banner.style.display='block';banner.innerHTML=`🍽️ TABLE ${tableNumber} ORDER — Your order will be sent to the cafe POS as a Table ${tableNumber} order.`;}
+ if(address){address.value=`Table ${tableNumber}`;address.readOnly=true;address.placeholder=`Table ${tableNumber}`;}
+}else{
+ if(banner) banner.style.display='none';
+ if(address){address.readOnly=false;if(address.value && /^Table \d+$/.test(address.value)) address.value='';address.placeholder='House / Street details';}
+}
+}
+
 async function loadDataAutomatically() {
-
-if (!licenseActive) { renderAllViews(); return; }
-
-try {
-
-const { data, error } = await db.from('cafe_store').select('data').eq('id', 1).single();
-
-if (data && data.data) {
-
-cafeMenu = data.data.menu || [];
-
-
-const rawDeals = data.data.deals || [];
-
-const todayStr = new Date().toISOString().slice(0, 10);
-
-cafeDeals = rawDeals.filter(d => !d.validUntil || d.validUntil >= todayStr);
-
-
-
-contactPhone = data.data.contactPhone || '03000878384';
-
+  // Customer browsing remains available regardless of the owner's subscription.
+  try {
+    const { data, error } = await db.from('cafe_store').select('data').eq('id', 1).single();
+    if (error) throw error;
+    if (data && data.data) {
+      cafeMenu = data.data.menu || [];
+      const rawDeals = data.data.deals || [];
+      const todayStr = new Date().toISOString().slice(0, 10);
+      cafeDeals = rawDeals.filter(d => !d.validUntil || d.validUntil >= todayStr);
+      contactPhone = data.data.contactPhone || '03000878384';
+    }
+  } catch (e) {
+    console.log('Loading cloud defaults...');
+  }
+  renderAllViews();
 }
-
-} catch (e) {
-
-console.log("Loading cloud defaults...");
-
-}
-
-renderAllViews();
-
-}
-
-
 
 function renderAllViews() {
 
@@ -790,126 +750,58 @@ document.getElementById('cartTotal').innerText = total;
 
 
 async function submitOnlineOrder() {
+  clearCustomerOrderNotice();
+  if (!(await verifyOrderingAvailability())) return;
+  if (cart.length === 0) return alert('Please add at least one item to your cart before submitting.');
 
-if (!licenseActive) { alert("Website activation required.     activation code    "); return; }
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const address = document.getElementById('custAddress').value.trim();
 
-if (cart.length === 0) return alert("Please add at least one item to your cart before submitting.");
+  if (!name || !phone || (!isTableOrder && !address)) {
+    return alert(isTableOrder
+      ? '⚠️ Please enter your Full Name and Mobile Phone Number to place your table order.'
+      : '⚠️ All details are mandatory!\nPlease enter your Full Name, Mobile Phone Number, and Delivery Address to place the order.');
+  }
 
+  const sourceOrderId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `ORD-${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
+  const orderData = {
+    orderId: null, sourceOrderId, invoiceAssigned: false,
+    timestamp: new Date().toLocaleString(), rawDate: new Date().toISOString().slice(0, 10),
+    customerName: name, phone, tableNumber: isTableOrder ? tableNumber : null,
+    orderType: isTableOrder ? 'table' : 'delivery', address: isTableOrder ? `Table ${tableNumber}` : address,
+    items: [...cart], totalAmount: cart.reduce((acc, i) => acc + i.total, 0),
+    acknowledged: false, status: 'Pending at Cafe POS...'
+  };
 
+  try {
+    const { data, error } = await db.from('cafe_store').select('data').eq('id', 1).single();
+    if (error) throw error;
+    let record = (data && data.data) ? data.data : {};
+    let existingOrders = Array.isArray(record.orders) ? record.orders : [];
+    if (existingOrders.some(o => o && o.sourceOrderId === sourceOrderId)) throw new Error('Duplicate order submission prevented.');
+    existingOrders.push(orderData);
+    record.orders = existingOrders;
+    const { error: saveError } = await db.from('cafe_store').upsert({ id: 1, data: record });
+    if (saveError) throw saveError;
 
-const name = document.getElementById('custName').value.trim();
+    const ownerWhatsApp = '923000878384';
+    const itemsListStr = orderData.items.map(i => `${i.qty}x ${i.name} (Rs.${i.total})`).join(', ');
+    const whatsappMessage = `🚨 *NEW ONLINE ORDER!* ${isTableOrder ? '🍽️' : '🛵'}\n\n*Source Order:* ${sourceOrderId.slice(0,8)}\n*Type:* ${isTableOrder ? `Table ${tableNumber}` : 'Home Delivery'}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address/Table:* ${orderData.address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
+    window.open(`https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
 
-const phone = document.getElementById('custPhone').value.trim();
-
-const address = document.getElementById('custAddress').value.trim();
-
-
-
-if (!name || !phone || (!isTableOrder && !address)) {
-
-return alert(isTableOrder
-  ? "⚠️ Please enter your Full Name and Mobile Phone Number to place your table order."
-  : "⚠️ All details are mandatory!\nPlease enter your Full Name, Mobile Phone Number, and Delivery Address to place the order.");
-
+    cart = []; updateCartUI();
+    document.getElementById('custName').value = '';
+    document.getElementById('custPhone').value = '';
+    document.getElementById('custAddress').value = '';
+    alert(isTableOrder ? `✅ Table ${tableNumber} order submitted successfully to MR FOOD CAFE NAVEED POS!` : '✅ Order submitted successfully to MR FOOD CAFE NAVEED POS!');
+    document.getElementById('trackPhoneInput').value = phone;
+    renderMyOrdersHistory();
+    switchView('ordersView');
+  } catch (e) {
+    showCustomerOrderNotice('Sorry, your order could not be submitted right now. Please try again later.', true);
+  }
 }
-
-
-
-const sourceOrderId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `ORD-${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
-
-const orderData = {
-
-// POS assigns the single shared invoice sequence when this order reaches the live POS.
-orderId: null,
-sourceOrderId: sourceOrderId,
-invoiceAssigned: false,
-
-timestamp: new Date().toLocaleString(),
-
-rawDate: new Date().toISOString().slice(0, 10),
-
-customerName: name,
-
-phone: phone,
-
-tableNumber: isTableOrder ? tableNumber : null,
-
-orderType: isTableOrder ? 'table' : 'delivery',
-
-address: isTableOrder ? `Table ${tableNumber}` : address,
-
-items: [...cart],
-
-totalAmount: cart.reduce((acc, i) => acc + i.total, 0),
-
-acknowledged: false,
-
-status: 'Pending at Cafe POS...'
-
-};
-
-
-
-try {
-
-const { data, error } = await db.from('cafe_store').select('data').eq('id', 1).single();
-
-let record = (data && data.data) ? data.data : {};
-
-
-let existingOrders = record.orders || [];
-
-existingOrders.push(orderData);
-
-record.orders = existingOrders;
-
-
-
-await db.from('cafe_store').upsert({ id: 1, data: record });
-
-
-
-const ownerWhatsApp = "923000878384";
-
-const itemsListStr = orderData.items.map(i => `${i.qty}x ${i.name} (Rs.${i.total})`).join(', ');
-
-const whatsappMessage = `🚨 *NEW ONLINE ORDER!* ${isTableOrder ? '🍽️' : '🛵'}\n\n*Source Order:* ${sourceOrderId.slice(0,8)}\n*Type:* ${isTableOrder ? `Table ${tableNumber}` : 'Home Delivery'}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address/Table:* ${orderData.address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
-
-
-window.open(`https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
-
-
-
-cart = [];
-
-updateCartUI();
-
-document.getElementById('custName').value = '';
-
-document.getElementById('custPhone').value = '';
-
-document.getElementById('custAddress').value = '';
-
-
-
-alert("✅ Order submitted successfully to MR FOOD CAFE NAVEED POS!");
-
-
-document.getElementById('trackPhoneInput').value = phone;
-
-renderMyOrdersHistory();
-
-switchView('ordersView');
-
-} catch (e) {
-
-alert("Error submitting order to cloud server.");
-
-}
-
-}
-
-
 
 async function renderMyOrdersHistory() {
 
@@ -1007,18 +899,12 @@ container.innerHTML = '<div class="info-panel"><p>Error fetching orders status.<
 
 
 
-window.onload = async () => {
-
-applyTableOrderMode();
-await checkCustomerLicense();
-loadDataAutomatically();
-
-setInterval(loadDataAutomatically, 7000);
-
-};
+window.addEventListener('load', async () => {
+  applyTableOrderMode();
+  renderTableMode();
+  await loadDataAutomatically();
+  setInterval(loadDataAutomatically, 7000);
+  setInterval(checkCustomerLicense, 60000);
+});
 
 </script>
-
-</body>
-
-</html>
