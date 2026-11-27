@@ -331,7 +331,7 @@ input:focus, textarea:focus { border-color: var(--watermelon); box-shadow: 0 0 0
 
 <textarea id="custAddress" placeholder="House / Street details" rows="2"></textarea>
 
-<button class="btn-submit" onclick="submitOnlineOrder()">Submit Order to Cafe POS 🛵</button>
+<button id="submitOrderBtn" class="btn-submit" onclick="submitOnlineOrder()">Submit Order to Cafe POS 🛵</button>
 
 </div>
 
@@ -430,6 +430,8 @@ const licenseDb = createClient(LICENSE_SUPABASE_URL, LICENSE_SUPABASE_ANON_KEY);
 const OWNER_LICENSE_SITE_URL = 'https://mr-food-pos.vercel.app';
 let licenseState = {status:'UNKNOWN', active_until:null, days_left:0};
 let licenseCheckBusy = false;
+let orderSubmitInProgress = false;
+let orderSubmitCompleted = false;
 
 async function checkCustomerLicense(){
   if(licenseCheckBusy) return licenseState;
@@ -669,6 +671,19 @@ document.getElementById('contactPhoneDisplay').innerText = contactPhone;
 
 function addToCart(name, price) {
 
+// A successful submission locks the previous button. Adding a new item starts a fresh order.
+if (orderSubmitCompleted) {
+  orderSubmitCompleted = false;
+  orderSubmitInProgress = false;
+  const submitBtn = document.getElementById('submitOrderBtn');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerText = 'Submit Order to Cafe POS 🛵';
+    submitBtn.style.opacity = '1';
+    submitBtn.style.cursor = 'pointer';
+  }
+}
+
 const existing = cart.find(c => c.name === name);
 
 if (existing) {
@@ -750,36 +765,69 @@ document.getElementById('cartTotal').innerText = total;
 
 
 async function submitOnlineOrder() {
-  clearCustomerOrderNotice();
-  if (!(await verifyOrderingAvailability())) return;
-  if (cart.length === 0) return alert('Please add at least one item to your cart before submitting.');
-
-  const name = document.getElementById('custName').value.trim();
-  const phone = document.getElementById('custPhone').value.trim();
-  const address = document.getElementById('custAddress').value.trim();
-
-  if (!name || !phone || (!isTableOrder && !address)) {
-    return alert(isTableOrder
-      ? '⚠️ Please enter your Full Name and Mobile Phone Number to place your table order.'
-      : '⚠️ All details are mandatory!\nPlease enter your Full Name, Mobile Phone Number, and Delivery Address to place the order.');
+  // Lock before the first await. Rapid double-clicks therefore share one submission.
+  if (orderSubmitInProgress) return;
+  orderSubmitInProgress = true;
+  const submitBtn = document.getElementById('submitOrderBtn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = '⏳ Submitting Order...';
+    submitBtn.style.opacity = '0.65';
+    submitBtn.style.cursor = 'wait';
   }
 
-  const sourceOrderId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `ORD-${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
-  const orderData = {
-    orderId: null, sourceOrderId, invoiceAssigned: false,
-    timestamp: new Date().toLocaleString(), rawDate: new Date().toISOString().slice(0, 10),
-    customerName: name, phone, tableNumber: isTableOrder ? tableNumber : null,
-    orderType: isTableOrder ? 'table' : 'delivery', address: isTableOrder ? `Table ${tableNumber}` : address,
-    items: [...cart], totalAmount: cart.reduce((acc, i) => acc + i.total, 0),
-    acknowledged: false, status: 'Pending at Cafe POS...'
-  };
+  clearCustomerOrderNotice();
 
   try {
+    if (!(await verifyOrderingAvailability())) throw new Error('ORDERING_UNAVAILABLE');
+    if (cart.length === 0) { alert('Please add at least one item to your cart before submitting.'); throw new Error('EMPTY_CART'); }
+
+    const name = document.getElementById('custName').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+    const address = document.getElementById('custAddress').value.trim();
+    if (!name || !phone || (!isTableOrder && !address)) {
+      alert(isTableOrder
+        ? '⚠️ Please enter your Full Name and Mobile Phone Number to place your table order.'
+        : '⚠️ All details are mandatory!\nPlease enter your Full Name, Mobile Phone Number, and Delivery Address to place the order.');
+      throw new Error('VALIDATION_FAILED');
+    }
+
+    // One source ID is created for this click and is never regenerated during the request.
+    const sourceOrderId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `ORD-${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
+    const orderData = {
+      orderId: null, sourceOrderId, invoiceAssigned: false,
+      timestamp: new Date().toLocaleString(), rawDate: new Date().toISOString().slice(0, 10),
+      createdAt: new Date().toISOString(),
+      customerName: name, phone, tableNumber: isTableOrder ? tableNumber : null,
+      orderType: isTableOrder ? 'table' : 'delivery', address: isTableOrder ? `Table ${tableNumber}` : address,
+      items: [...cart], totalAmount: cart.reduce((acc, i) => acc + i.total, 0),
+      acknowledged: false, status: 'Pending at Cafe POS...'
+    };
+
     const { data, error } = await db.from('cafe_store').select('data').eq('id', 1).single();
     if (error) throw error;
     let record = (data && data.data) ? data.data : {};
     let existingOrders = Array.isArray(record.orders) ? record.orders : [];
-    if (existingOrders.some(o => o && o.sourceOrderId === sourceOrderId)) throw new Error('Duplicate order submission prevented.');
+
+    // Server-side duplicate guard for old browsers/rapid retries.
+    const normalizedPhone = String(phone).replace(/\D/g, '');
+    const itemSignature = orderData.items.map(i => `${String(i.name).trim().toLowerCase()}|${Number(i.qty)}|${Number(i.price)}`).sort().join('~');
+    const isRecentDuplicate = existingOrders.some(o => {
+      if (!o) return false;
+      if (o.sourceOrderId && String(o.sourceOrderId) === String(sourceOrderId)) return true;
+      const otherPhone = String(o.phone || '').replace(/\D/g, '');
+      const otherItems = Array.isArray(o.items) ? o.items.map(i => `${String(i.name).trim().toLowerCase()}|${Number(i.qty)}|${Number(i.price)}`).sort().join('~') : '';
+      const t = Date.parse(o.createdAt || o.timestamp || '');
+      const recent = Number.isFinite(t) && Math.abs(Date.now() - t) <= 8000;
+      return recent && otherPhone === normalizedPhone &&
+        String(o.orderType || 'delivery') === String(orderData.orderType) &&
+        String(o.tableNumber || '') === String(orderData.tableNumber || '') &&
+        String(o.address || '').trim().toLowerCase() === String(orderData.address || '').trim().toLowerCase() &&
+        Number(o.totalAmount || 0) === Number(orderData.totalAmount || 0) &&
+        otherItems === itemSignature;
+    });
+    if (isRecentDuplicate) throw new Error('DUPLICATE_RECENT_ORDER');
+
     existingOrders.push(orderData);
     record.orders = existingOrders;
     const { error: saveError } = await db.from('cafe_store').upsert({ id: 1, data: record });
@@ -788,18 +836,39 @@ async function submitOnlineOrder() {
     const ownerWhatsApp = '923000878384';
     const itemsListStr = orderData.items.map(i => `${i.qty}x ${i.name} (Rs.${i.total})`).join(', ');
     const whatsappMessage = `🚨 *NEW ONLINE ORDER!* ${isTableOrder ? '🍽️' : '🛵'}\n\n*Source Order:* ${sourceOrderId.slice(0,8)}\n*Type:* ${isTableOrder ? `Table ${tableNumber}` : 'Home Delivery'}\n*Customer:* ${name}\n*Phone:* ${phone}\n*Address/Table:* ${orderData.address}\n*Items:* ${itemsListStr}\n*Total:* Rs. ${orderData.totalAmount}\n\n_Please check your Cafe POS Dashboard!_`;
-    window.open(`https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+    try { window.open(`https://wa.me/${ownerWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`, '_blank'); } catch (e) {}
 
-    cart = []; updateCartUI();
+    cart = [];
+    updateCartUI();
     document.getElementById('custName').value = '';
     document.getElementById('custPhone').value = '';
     document.getElementById('custAddress').value = '';
-    alert(isTableOrder ? `✅ Table ${tableNumber} order submitted successfully to MR FOOD CAFE NAVEED POS!` : '✅ Order submitted successfully to MR FOOD CAFE NAVEED POS!');
+
+    orderSubmitCompleted = true;
+    if (submitBtn) {
+      submitBtn.innerText = '✅ Order Submitted';
+      submitBtn.style.opacity = '1';
+      submitBtn.style.cursor = 'default';
+    }
+    alert(isTableOrder ? `✅ Table ${tableNumber} order submitted successfully!` : '✅ Order submitted successfully!');
     document.getElementById('trackPhoneInput').value = phone;
     renderMyOrdersHistory();
     switchView('ordersView');
   } catch (e) {
-    showCustomerOrderNotice('Sorry, your order could not be submitted right now. Please try again later.', true);
+    if (e && e.message === 'DUPLICATE_RECENT_ORDER') {
+      showCustomerOrderNotice('This order was already submitted. Please wait for the cafe POS to receive it.', true);
+      alert('This order was already submitted. Please wait for the cafe POS to receive it.');
+    } else if (e && e.message !== 'ORDERING_UNAVAILABLE' && e.message !== 'EMPTY_CART' && e.message !== 'VALIDATION_FAILED') {
+      showCustomerOrderNotice('Sorry, your order could not be submitted right now. Please try again later.', true);
+    }
+
+    orderSubmitInProgress = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Submit Order to Cafe POS 🛵';
+      submitBtn.style.opacity = '1';
+      submitBtn.style.cursor = 'pointer';
+    }
   }
 }
 
